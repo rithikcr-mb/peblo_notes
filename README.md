@@ -4,103 +4,59 @@ An AI-powered, premium markdown workspace designed for seamless thought capture,
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## Architecture Overview
 
-Peblo Notes is built with a serverless, decoupled architecture prioritizing low-latency client state management and streaming AI workflows.
+Peblo Notes is a full-stack AI-powered notes workspace built with Next.js App Router, Prisma, PostgreSQL, and Google Gemini.
 
-### 🌐 Core Application Flow
+The system is structured around:
 
-```
-[Login/Signup Page] 
-       ↓
-[Main Dashboard] 
-       ↓
-[Three-Panel Workspace: Sidebar List → Editor Panel → AI Tools Drawer]
-       ↓
-[Public Shared Page] / [Productivity Analytics Dashboard]
+- Server-rendered dashboard routes
+- API-driven note mutations
+- React Query for async server-state synchronization
+- Prisma ORM for relational persistence
+- Streaming AI responses for low-latency UX
+- Debounced autosave for responsive editing
 
-```
+### Core Flow
 
-### 🤖 Gemini AI Workflow
+Authentication → Dashboard → Notes Workspace → AI Actions → Shared Notes / Analytics
 
-```
-[Frontend UI Action] ──> [Next.js API Route] ──> [Gemini API Server] ──> [Prisma DB Log] ──> [Stream UI / Toast View]
+### AI Workflow
 
-```
+Client Action → API Route → Gemini API → Stream Response → Persist Generation → Update UI
 
-### ⚡ Auto-Save Engine
+### Autosave Strategy
 
-```
-[User Types Content] ──> [Debounce Timer (1000ms)] ──> [API Server Trigger] ──> [Update "Saved" UI Status]
-
-```
+Editor Input → Debounced Mutation → Database Update → Save Status Feedback
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## Tech Stack
 
-* **Framework:** Next.js 14+ (App Router) with TypeScript
-* **Database & ORM:** PostgreSQL (Serverless via Neon DB) + Prisma ORM
-* **Authentication:** Auth.js (NextAuth.js) using JWT-based persistent sessions & `bcryptjs`
-* **State Management & Fetching:** Zustand (Global Client State) + React Query (Server Cache Coordination)
-* **AI Engine:** Google Gemini API (`@google/generative-ai`)
-* **Styling & UI:** Tailwind CSS + `shadcn/ui` + Lucide Icons
-* **Data Validation:** Zod + React Hook Form
+### Frontend
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- React Query
 
----
+### Backend
+- Next.js Route Handlers
+- Prisma ORM
+- PostgreSQL (Neon)
 
-## 🗄️ Database Schema (Entity-Relationship)
+### Authentication
+- NextAuth.js
+- bcryptjs password hashing
 
-The underlying relational schema is optimized for cascading performance, indexing constraints, and relational tagging structures.
+### AI Integration
+- Google Gemini API
+- Streaming AI responses
+- Background persistence for AI generations
 
-```prisma
-model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  password      String
-  notes         Note[]
-  aiGenerations AiGeneration[]
-  createdAt     DateTime       @default(now())
-}
-
-model Note {
-  id          String       @id @default(cuid())
-  title       String
-  content     String       @db.Text
-  isArchived  Boolean      @default(false)
-  userId      String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags        Tag[]
-  sharedLinks SharedLink[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model Tag {
-  id    String @id @default(cuid())
-  name  String
-  notes Note[]
-}
-
-model SharedLink {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  isActive  Boolean  @default(true)
-  noteId    String
-  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-}
-
-model AiGeneration {
-  id        String   @id @default(cuid())
-  type      String   // "summary" | "action_items" | "title"
-  result    String   @db.Text
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-}
-
-```
+### Validation & Forms
+- Zod
+- React Hook Form
 
 ---
 
@@ -176,6 +132,23 @@ npm run dev
 Open **[http://localhost:3000](https://www.google.com/search?q=http://localhost:3000)** inside your browser to interact with the system.
 
 ---
+## Technical Decisions
+
+### Why React Query
+React Query was used to separate async server state from local UI state while simplifying autosave synchronization, mutation handling, and cache invalidation.
+
+### Why Prisma + PostgreSQL
+Prisma provided type-safe relational modeling for notes, tags, AI generations, and shared links while keeping schema evolution manageable.
+
+### AI Response Streaming
+AI responses are streamed incrementally to improve perceived responsiveness and reduce blocking during long generations.
+
+### Autosave Architecture
+Autosave uses debounced mutations to minimize unnecessary database writes while preserving a responsive editing experience.
+
+### Serverless Compatibility
+The application is designed around serverless-friendly API routes and PostgreSQL connection pooling recommendations for Neon deployments.
+---
 
 ## ✨ Features Checklist & Milestones
 
@@ -196,6 +169,26 @@ Open **[http://localhost:3000](https://www.google.com/search?q=http://localhost:
 * [x] **Secure Access Gate:** NextAuth router middleware protection with `bcryptjs` password hashing.
 * [x] **Crypto-Token Shared Links:** Secure, read-only static paths (`/shared/{token}`) for selective public document exposure.
 * [x] **Productivity Analytics:** Activity heatmap generation and writing analytics charts powered by `recharts`.
+
+---
+
+## Production Considerations
+
+- Environment variables documented via `.env.example`
+- AI routes protected with basic rate limiting
+- Protected dashboard routes via authentication middleware
+- Prisma indexes added for common note query paths
+- Production builds validated before submission
+- Public share links isolated from authenticated note routes
+
+---
+
+## Known Limitations / Future Improvements
+
+- Current rate limiting uses in-memory storage and should be replaced with Redis or Vercel KV in distributed environments.
+- Search currently relies on client-side filtering and could evolve toward full-text database search.
+- Realtime collaboration is out of scope for this submission but the architecture is structured to evolve toward collaborative editing.
+- AI retry/cancellation flows can be expanded further for production-scale UX resilience.
 
 ---
 
