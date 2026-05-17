@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  passwordHash  String
+  image         String?
+  notes         Note[]
+  aiGenerations AiGeneration[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Note {
+  id            String         @id @default(cuid())
+  title         String
+  content       String         @db.Text
+  category      String         @default("Personal")
+  archived      Boolean        @default(false)
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags          Tag[]
+  sharedLinks   SharedLink[]
+  aiGenerations AiGeneration[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("#0f766e")
+  noteId    String
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([noteId, name])
+}
+
+model SharedLink {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  noteId    String
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  active    Boolean  @default(true)
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+}
+
+model AiGeneration {
+  id        String   @id @default(cuid())
+  type      String
+  prompt    String   @db.Text
+  response  String   @db.Text
+  noteId    String
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

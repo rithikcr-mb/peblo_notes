@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fffdf8;
+  --foreground: #20143f;
+  --peblo-ink: #20143f;
+  --peblo-muted: #6d627f;
+  --peblo-purple: #7447e8;
+  --peblo-purple-deep: #4b25bd;
+  --peblo-purple-soft: #f1ebff;
+  --peblo-gold: #d9961d;
+  --peblo-gold-soft: #fff1c8;
+  --peblo-border: #e9ddff;
+  /* Motion tokens */
+  --motion-fast: 120ms;
+  --motion-medium: 200ms;
+  --motion-easing: cubic-bezier(.2,.9,.2,1);
+  --card-shadow: 0 18px 45px rgba(74,37,189,0.08);
+  --card-shadow-elevated: 0 30px 80px rgba(116,71,232,0.12);
+  --control-press-scale: 0.98;
+  /* Spacing tokens */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --container-max: 1600px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #171028;
+    --foreground: #fffaff;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+::selection {
+  background: #dacaff;
+  color: #2b176b;
+}
+
+.peblo-shell {
+  background:
+    radial-gradient(circle at 9% 8%, rgba(245, 181, 50, 0.2), transparent 28%),
+    radial-gradient(circle at 90% 10%, rgba(116, 71, 232, 0.18), transparent 30%),
+    linear-gradient(135deg, #fffdf8 0%, #fbf8ff 48%, #f3efff 100%);
+}
+
+.peblo-surface {
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 25px 70px rgba(73, 37, 189, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.peblo-gloss {
+  position: relative;
+  overflow: hidden;
+}
+
+.peblo-gloss::before {
+  content: "";
+  position: absolute;
+  inset: 1px auto auto 8%;
+  height: 34%;
+  width: 76%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+/* Motion and interaction helpers */
+.peblo-motion-card {
+  transition: transform var(--motion-medium) var(--motion-easing), box-shadow var(--motion-medium) var(--motion-easing);
+  will-change: transform, box-shadow;
+}
+.peblo-motion-card:hover,
+.peblo-motion-card:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: var(--card-shadow-elevated);
+}
+
+.peblo-button-press {
+  transition: transform var(--motion-fast) var(--motion-easing), opacity var(--motion-fast) var(--motion-easing);
+  will-change: transform, opacity;
+}
+.peblo-button-press:active {
+  transform: scale(var(--control-press-scale));
+}
+
+.peblo-motion-input {
+  transition: box-shadow var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+}
+.peblo-motion-input:focus {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peblo-motion-card,
+  .peblo-button-press,
+  .peblo-motion-input {
+    transition: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+}
+
+.markdown-preview h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.markdown-preview h2 {
+  font-size: 1.35rem;
+  font-weight: 650;
+  margin: 1.25rem 0 0.65rem;
+}
+
+.markdown-preview p,
+.markdown-preview li {
+  color: var(--peblo-muted);
+  line-height: 1.75;
+}
+
+.markdown-preview ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.markdown-preview code {
+  border-radius: 0.375rem;
+  background: var(--peblo-purple-soft);
+  padding: 0.125rem 0.375rem;
+}
