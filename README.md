@@ -1,7 +1,3 @@
-Here is a professional, production-ready `README.md` tailored specifically to your tech stack and feature set. It includes architecture diagrams, setup guides, and structural breakdowns to make your repository stand out to any technical reviewer or interviewer.
-
----
-
 # Peblo Notes 📝
 
 An AI-powered, premium markdown workspace designed for seamless thought capture, context-aware intelligence, and deep productivity analytics. Built with a robust Next.js enterprise stack, Peblo Notes features a high-performance three-panel workspace, an auto-saving engine, and native integration with the Google Gemini API.
